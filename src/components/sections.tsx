@@ -45,6 +45,7 @@ function Reveal({
 export function Hero({ data }: { data: Invitation }) {
   const off = useMotionOff();
   const d = (n: number) => (off ? 0 : n);
+  const hasBothNames = Boolean(data.groomName && data.brideName);
 
   return (
     <section className="relative flex min-h-[100svh] flex-col items-center justify-center px-6 pb-24 pt-16">
@@ -136,18 +137,10 @@ export function Hero({ data }: { data: Invitation }) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: d(1.4), delay: d(4.4), ease }}
       >
-        <h1 className="display text-[3.1rem] leading-[1] tracking-[0.06em] text-ink sm:text-7xl">
-          {data.groomName.toUpperCase()}
-        </h1>
-        <div className="my-3 flex items-center justify-center gap-4">
-          <span className="hairline w-14" />
-          <span className="display text-2xl italic text-champagne">&amp;</span>
-          <span className="hairline w-14" />
-        </div>
-        <h1 className="display text-[3.1rem] leading-[1] tracking-[0.06em] text-ink sm:text-7xl">
-          {data.brideName.toUpperCase()}
-        </h1>
-        <p className="eyebrow mt-7">{data.date}</p>
+        {data.groomName && <h1 className="display text-[3.1rem] leading-[1] tracking-[0.06em] text-ink sm:text-7xl">{data.groomName.toUpperCase()}</h1>}
+        {hasBothNames && <div className="my-3 flex items-center justify-center gap-4"><span className="hairline w-14" /><span className="display text-2xl italic text-champagne">&amp;</span><span className="hairline w-14" /></div>}
+        {data.brideName && <h1 className="display text-[3.1rem] leading-[1] tracking-[0.06em] text-ink sm:text-7xl">{data.brideName.toUpperCase()}</h1>}
+        {data.date && <p className="eyebrow mt-7">{data.date}</p>}
       </motion.div>
 
       <motion.div
@@ -411,7 +404,7 @@ export function Events({ data }: { data: Invitation }) {
                   <a
                     href={ev.mapsUrl}
                     target="_blank"
-                    rel="noreferrer"
+                    rel="noreferrer noopener"
                     className="eyebrow mt-8 inline-block border-b border-champagne/70 pb-1 text-ink transition-colors hover:text-champagne"
                   >
                     View location
@@ -544,7 +537,7 @@ export function Venue({ data }: { data: Invitation }) {
             <a
               href={data.venue.mapsUrl}
               target="_blank"
-              rel="noreferrer"
+              rel="noreferrer noopener"
               className="eyebrow mt-9 inline-block border border-border px-7 py-3 text-ink transition-colors hover:border-champagne hover:text-champagne"
             >
               Get directions
@@ -734,7 +727,7 @@ function IconLink({ kind, href, label }: { kind: string; href: string; label: st
     <a
       href={href}
       target="_blank"
-      rel="noreferrer"
+      rel="noreferrer noopener"
       aria-label={label}
       className="flex h-10 w-10 items-center justify-center rounded-full border border-border text-ink transition-colors hover:border-champagne hover:text-champagne"
     >
@@ -742,6 +735,29 @@ function IconLink({ kind, href, label }: { kind: string; href: string; label: st
         <path d={socialIcons[kind]} />
       </svg>
     </a>
+  );
+}
+
+export function Contacts({ contacts }: { contacts: { name?: string; phone: string; whatsapp_url?: string }[] }) {
+  if (!contacts.length) return null;
+  return (
+    <section className="relative px-6 py-24 sm:py-32">
+      <Reveal className="mx-auto max-w-xl text-center">
+        <p className="eyebrow">Contact</p>
+        <div className="mx-auto mt-10 grid max-w-md gap-5 sm:grid-cols-2">
+          {contacts.map((contact, index) => {
+            const whatsapp = contact.whatsapp_url || `https://wa.me/${contact.phone.replace(/\D/g, "")}`;
+            return <div key={`${contact.phone}-${index}`} className="border-y border-border px-4 py-7">
+              {contact.name && <p className="display text-xl text-ink">{contact.name}</p>}
+              <div className="mt-5 flex justify-center gap-5">
+                <a href={`tel:${contact.phone}`} className="eyebrow border-b border-champagne pb-1 text-ink">Call</a>
+                <a href={whatsapp} target="_blank" rel="noreferrer noopener" className="eyebrow border-b border-champagne pb-1 text-ink">WhatsApp</a>
+              </div>
+            </div>;
+          })}
+        </div>
+      </Reveal>
+    </section>
   );
 }
 
