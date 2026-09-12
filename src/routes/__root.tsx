@@ -7,10 +7,9 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
-import { reportLovableError } from "../lib/lovable-error-reporting";
 
 function NotFoundComponent() {
   return (
@@ -37,9 +36,6 @@ function NotFoundComponent() {
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
-  useEffect(() => {
-    reportLovableError(error, { boundary: "tanstack_root_error_component" });
-  }, [error]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -77,26 +73,32 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
+      { title: "ZAR Invitation" },
+      { name: "description", content: "You have been invited" },
+      { name: "theme-color", content: "#ffffff" },
     ],
     links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
+      { rel: "stylesheet", href: appCss },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@200;300;400;500&family=Noto+Naskh+Arabic:wght@400;500&display=swap",
       },
+      { rel: "apple-touch-icon", sizes: "57x57", href: "/apple-icon-57x57.png" },
+      { rel: "apple-touch-icon", sizes: "60x60", href: "/apple-icon-60x60.png" },
+      { rel: "apple-touch-icon", sizes: "72x72", href: "/apple-icon-72x72.png" },
+      { rel: "apple-touch-icon", sizes: "76x76", href: "/apple-icon-76x76.png" },
+      { rel: "apple-touch-icon", sizes: "114x114", href: "/apple-icon-114x114.png" },
+      { rel: "apple-touch-icon", sizes: "120x120", href: "/apple-icon-120x120.png" },
+      { rel: "apple-touch-icon", sizes: "144x144", href: "/apple-icon-144x144.png" },
+      { rel: "apple-touch-icon", sizes: "152x152", href: "/apple-icon-152x152.png" },
+      { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-icon-180x180.png" },
+      { rel: "icon", type: "image/png", sizes: "192x192", href: "/android-icon-192x192.png" },
+      { rel: "icon", type: "image/png", sizes: "32x32", href: "/favicon-32x32.png" },
+      { rel: "icon", type: "image/png", sizes: "96x96", href: "/favicon-96x96.png" },
+      { rel: "icon", type: "image/png", sizes: "16x16", href: "/favicon-16x16.png" },
+      { rel: "manifest", href: "/manifest.json" },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
 
@@ -131,3 +133,4 @@ function RootComponent() {
     </QueryClientProvider>
   );
 }
+

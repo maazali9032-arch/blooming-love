@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { useScroll } from "motion/react";
+import { useScroll, motion } from "motion/react";
 import type { Invitation } from "@/data/invitation";
 import { VineSpine } from "@/components/vine-spine";
 import { MusicToggle } from "@/components/music-toggle";
@@ -13,7 +13,7 @@ type PageState =
   | { kind: "error" }
   | { kind: "not_found" }
   | { kind: "fallback"; shop: PublicResponse["shop"] }
-  | { kind: "live"; content: PublicInvitationContent };
+  | { kind: "live"; content: PublicInvitationContent; shop?: PublicResponse["shop"] };
 
 const string = (value: unknown) => typeof value === "string" ? value.trim() : "";
 const object = (value: unknown): Record<string, unknown> | undefined => value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : undefined;
@@ -63,7 +63,7 @@ function PublicInvitationRoute() {
     if (!slug) { setState({ kind: "not_found" }); return; }
     setState({ kind: "loading" });
     void fetchPublicInvitation(slug).then((data) => {
-      if (data.state === "live" && object(data.content)) setState({ kind: "live", content: data.content! });
+      if (data.state === "live" && object(data.content)) setState({ kind: "live", content: data.content!, shop: data.shop });
       else if (data.state === "fallback") setState({ kind: "fallback", shop: data.shop ?? {} });
       else setState({ kind: "not_found" });
     }).catch(() => setState({ kind: "error" }));
@@ -74,10 +74,30 @@ function PublicInvitationRoute() {
   if (state.kind === "error") return <ErrorState retry={reload} />;
   if (state.kind === "not_found") return <NotFoundState />;
   if (state.kind === "fallback") return <FallbackState shop={state.shop} />;
-  return <LiveInvitation content={state.content} />;
+  return <LiveInvitation content={state.content} shop={state.shop} />;
 }
 
-function LiveInvitation({ content }: { content: PublicInvitationContent }) {
+function FloatingShopShowcase({ shopName }: { shopName?: string }) {
+  if (!shopName) return null;
+  
+  return (
+    <div className="fixed bottom-0 left-0 w-full z-[100] bg-background/50 backdrop-blur-sm pointer-events-none border-t border-champagne/10 overflow-hidden h-6 flex items-center">
+      <motion.div
+        className="flex whitespace-nowrap min-w-max"
+        animate={{ x: ["0%", "-50%"] }}
+        transition={{ repeat: Infinity, ease: "linear", duration: 12 }}
+      >
+        {[...Array(20)].map((_, i) => (
+          <span key={i} className="text-[0.55rem] uppercase tracking-[0.2em] text-ink/70 mx-8">
+            {shopName}
+          </span>
+        ))}
+      </motion.div>
+    </div>
+  );
+}
+
+function LiveInvitation({ content, shop }: { content: PublicInvitationContent, shop?: PublicResponse["shop"] }) {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
   const data = useMemo(() => toInvitation(content), [content]);
@@ -85,7 +105,7 @@ function LiveInvitation({ content }: { content: PublicInvitationContent }) {
   const countdownIsValid = Boolean(data.dateISO && new Date(data.dateISO).getTime() > Date.now());
   const hasVenue = Boolean(data.venue.name || data.venue.address || data.venue.city);
 
-  return <main ref={ref} className="paper grain relative w-full overflow-x-clip">
+  return <main ref={ref} className="paper grain relative w-full overflow-x-clip pb-6">
     <VineSpine progress={scrollYProgress} />
     <div className="relative z-10">
       <Hero data={data} />
@@ -97,5 +117,6 @@ function LiveInvitation({ content }: { content: PublicInvitationContent }) {
       <Finale data={data} />
     </div>
     {data.music?.enabled && <MusicToggle label="Music" src={data.music.src} />}
+    <FloatingShopShowcase shopName={shop?.name} />
   </main>;
 }
