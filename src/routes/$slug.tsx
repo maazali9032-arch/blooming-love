@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useScroll, motion } from "motion/react";
 import type { Invitation } from "@/data/invitation";
 import { VineSpine } from "@/components/vine-spine";
+import decorativeFrame from "@/assets/decorative-frame.webp";
 import { MusicToggle } from "@/components/music-toggle";
 import { Contacts, Countdown, Events, Finale, Gallery, Hero, Venue } from "@/components/sections";
 import { ErrorState, FallbackState, LoadingState, NotFoundState } from "@/components/invitation-state";
@@ -105,18 +106,29 @@ function LiveInvitation({ content, shop }: { content: PublicInvitationContent, s
   const countdownIsValid = Boolean(data.dateISO && new Date(data.dateISO).getTime() > Date.now());
   const hasVenue = Boolean(data.venue.name || data.venue.address || data.venue.city);
 
-  return <main ref={ref} className="paper grain relative w-full overflow-x-clip pb-6">
-    <VineSpine progress={scrollYProgress} />
-    <div className="relative z-10">
-      <Hero data={data} />
-      {countdownIsValid && <Countdown data={data} />}
-      {data.events.length > 0 && <Events data={data} />}
-      {data.gallery.length > 0 && <Gallery data={data} />}
-      {hasVenue && <Venue data={data} />}
-      <Contacts contacts={contacts} />
-      <Finale data={data} />
-    </div>
-    {data.music?.enabled && <MusicToggle label="Music" src={data.music.src} />}
-    <FloatingShopShowcase shopName={shop?.name} />
-  </main>;
+  return (
+    <main ref={ref} className="paper grain relative w-full overflow-x-clip pb-6">
+      <img
+        src={decorativeFrame}
+        alt=""
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 z-0 hidden h-full w-full object-fill max-[684px]:block"
+      />
+
+      <VineSpine progress={scrollYProgress} />
+
+      <div className="relative z-10">
+        <Hero data={data} />
+        {countdownIsValid && <Countdown data={data} />}
+        {data.events.length > 0 && <Events data={data} />}
+        {data.gallery.length > 0 && <Gallery data={data} />}
+        {hasVenue && <Venue data={data} />}
+        <Contacts contacts={contacts} />
+        <Finale data={data} />
+      </div>
+
+      {data.music?.enabled && <MusicToggle label="Music" src={data.music.src} />}
+      <FloatingShopShowcase shopName={shop?.name} />
+    </main>
+  );
 }
